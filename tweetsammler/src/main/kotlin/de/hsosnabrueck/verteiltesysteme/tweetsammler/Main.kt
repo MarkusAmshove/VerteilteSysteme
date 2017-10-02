@@ -14,7 +14,6 @@ fun main(args: Array<String>) {
                 println(hashTags.joinToString("\n"))
             }
 
-
             val configurationBuilder = ConfigurationBuilder()
 
             configurationBuilder.setOAuthConsumerKey(System.getenv("TWITTER_CONSUMERKEY"))
@@ -26,7 +25,8 @@ fun main(args: Array<String>) {
             val twitterStreamFactory = TwitterStreamFactory(configurationBuilder.build())
             val twitterStream = twitterStreamFactory.instance
 
-            StreamListenerHelper.addStatusListener(twitterStream, Listener())
+            val mqSender = MQSender("192.168.0.151", "geoLocatoins")
+            StreamListenerHelper.addStatusListener(twitterStream, Listener(mqSender))
 
             val filterQuery = FilterQuery()
             if (hashTags.isNotEmpty()) {
@@ -44,7 +44,9 @@ fun main(args: Array<String>) {
 val ganzeWelt = arrayOf(doubleArrayOf(-180.0, -90.0), doubleArrayOf(180.0, 90.0))
 
 
-class Listener : StatusListener {
+class Listener(private val mqSender: MQSender) : StatusListener {
+    private var gesendet = 0
+
     override fun onTrackLimitationNotice(numberOfLimitedStatuses: Int) {
     }
 
@@ -60,7 +62,9 @@ class Listener : StatusListener {
 
     override fun onStatus(status: Status) {
         if(status.geoLocation==null) return
-        println("(${status.createdAt})[${status.geoLocation.latitude}:${status.geoLocation.longitude}] @${status.user.screenName}")
+        mqSender.neueLocation(status.geoLocation)
+        gesendet++
+        print("\rGesendet: $gesendet")
     }
 
     override fun onScrubGeo(userId: Long, upToStatusId: Long) {
