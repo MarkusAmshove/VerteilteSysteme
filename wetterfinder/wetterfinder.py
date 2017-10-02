@@ -28,8 +28,8 @@ class Location:
 
 
 class Wetter:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, status):
+        self.status = status
 
 
 def location_decoder(obj):

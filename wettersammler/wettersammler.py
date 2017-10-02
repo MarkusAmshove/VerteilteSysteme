@@ -7,39 +7,41 @@ from pika import PlainCredentials
 
 
 class Datenbank:
-    def __init__(self, datenbankName):
-        self.datenbank = sqlite3.connect(datenbankName)
+    def __init__(self, datenbankname):
+        self.datenbank = sqlite3.connect(datenbankname)
         self.datenbank.text_factory = str
-        self.datenbank.execute("CREATE TABLE IF NOT EXISTS Staedte ( Staedtename TEXT, Tweets INT)")
+        self.datenbank.execute("CREATE TABLE IF NOT EXISTS Wetter ( Status TEXT, Tweets INT)")
 
-    def stadt_existiert(self, staedtename):
-        ergebnis = self.datenbank.execute("SELECT COUNT(*) FROM Staedte WHERE Staedtename=?", (staedtename,)).fetchone()
+    def wetter_existiert(self, status):
+        ergebnis = self.datenbank.execute("SELECT COUNT(*) FROM Wetter WHERE Status=?", (status,)).fetchone()
         return ergebnis[0] > 0
 
-    def lege_stadt_an(self, staedtename):
-        self.datenbank.execute("INSERT INTO Staedte (Staedtename, Tweets) VALUES (?,?)", (staedtename, 1))
+    def lege_wetter_an(self, status):
+        self.datenbank.execute("INSERT INTO Wetter (Status, Tweets) VALUES (?,?)", (status, 1))
         self.datenbank.commit()
 
-    def update_stadt(self, staedtename):
-        self.datenbank.execute("UPDATE Staedte SET Tweets = Tweets + 1 WHERE Staedtename=?", (staedtename,))
+    def update_wetter(self, status):
+        self.datenbank.execute("UPDATE Wetter SET Tweets = Tweets + 1 WHERE Status=?", (status,))
         self.datenbank.commit()
 
-    def ermittle_anzahl_tweets(self, staedtename):
-        return self.datenbank.execute("SELECT Tweets FROM Staedte WHERE Staedtename=?", (staedtename,)).fetchone()
+    def ermittle_anzahl_tweets(self, status):
+        return self.datenbank.execute("SELECT Tweets FROM Wetter WHERE Status=?", (status,)).fetchone()
 
 
 class StadtFinder:
-    def __init__(self, dieDatenbank):
-        self.datenbank = dieDatenbank
+    def __init__(self, diedatenbank):
+        self.datenbank = diedatenbank
         self.zugeordneteTweets = 0
 
     def stadt_gefunden(self, channel, method, properties, body):
-        stadt = str(json.loads(body)['name'].encode('utf-8'))
-        stadt_existiert = self.datenbank.stadt_existiert(stadt)
+        status = str(json.loads(body)['status'])
+        if len(status) == 0:
+            return
+        stadt_existiert = self.datenbank.wetter_existiert(status)
         if stadt_existiert:
-            self.datenbank.update_stadt(stadt)
+            self.datenbank.update_wetter(status)
         else:
-            self.datenbank.lege_stadt_an(stadt)
+            self.datenbank.lege_wetter_an(status)
         self.zugeordneteTweets += 1
         sys.stdout.write("\rZugeordnete Tweets: " + str(self.zugeordneteTweets))
         sys.stdout.flush()
@@ -50,12 +52,12 @@ connection = pika.BlockingConnection(
     pika.ConnectionParameters('192.168.0.151', credentials=PlainCredentials("gast", "gast")))
 
 gefundeneStaedteChannel = connection.channel()
-gefundeneStaedteChannel.queue_declare("gefundeneStaedte", durable=True)
+gefundeneStaedteChannel.queue_declare("gefundenesWetter", durable=True)
 
 datenbank = Datenbank("datenbank.db")
 stadtFinder = StadtFinder(datenbank)
 
 print("Los gehts")
 gefundeneStaedteChannel.basic_consume(stadtFinder.stadt_gefunden,
-                                      queue="gefundeneStaedte")
+                                      queue="gefundenesWetter")
 gefundeneStaedteChannel.start_consuming()
