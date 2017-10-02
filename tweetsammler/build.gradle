@@ -29,6 +29,7 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile 'org.twitter4j:twitter4j-core:4.0.6'
+    compile 'org.twitter4j:twitter4j-stream:4.0.6'
     compile 'com.xenomachina:kotlin-argparser:2.0.3'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
