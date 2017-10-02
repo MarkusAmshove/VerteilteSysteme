@@ -73,21 +73,6 @@ class StaedteFinder:
                                           body=json.dumps(stadt.__dict__))
 
 
-# def callback(ch, method, properties, body):
-#     location = json.loads(body, object_hook=location_decoder)
-#     reverse_geocode = gmaps.reverse_geocode((location.latitude, location.longitude))
-#     city = get_city(reverse_geocode)
-#     if city is None:
-#         return
-#     ch.basic_ack(delivery_tag=method.delivery_tag)
-#     gefundeneStaedte += 1
-#     print("\rGefundene Staedte: " + str(gefundeneStaedte))
-#     stadt = Stadt(city)
-#     staedteChannel.basic_publish(exchange='',
-#                                  routing_key=STAEDTE_GEOLOCATION_QUEUE,
-#                                  body=json.dumps(stadt.__dict__))
-
-
 staedteFinder = StaedteFinder(staedteChannel, STAEDTE_GEOLOCATION_QUEUE)
 
 locationChannel.basic_consume(staedteFinder.tweet_erhalten,
