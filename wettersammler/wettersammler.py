@@ -25,20 +25,27 @@ class Datenbank:
         self.datenbank.commit()
 
     def ermittle_anzahl_tweets(self, status):
-        return self.datenbank.execute("SELECT Tweets FROM Wetter WHERE Status=?", (status,)).fetchone()
+        return self.datenbank.execute("SELECT Tweets FROM Wetter WHERE Status=?", (status,)).fetchone()[0]
+
+
+class WetterStatistik(object):
+    def __init__(self, status, tweets):
+        self.status = status
+        self.tweets = tweets
 
 
 class StadtFinder:
-    def __init__(self, diedatenbank):
+    def __init__(self, diedatenbank, statistikchannel):
         self.datenbank = diedatenbank
         self.zugeordneteTweets = 0
+        self.statistikchannel = statistikchannel
 
     def stadt_gefunden(self, channel, method, properties, body):
         status = str(json.loads(body)['status'])
         if len(status) == 0:
             return
-        stadt_existiert = self.datenbank.wetter_existiert(status)
-        if stadt_existiert:
+        wetter_existiert = self.datenbank.wetter_existiert(status)
+        if wetter_existiert:
             self.datenbank.update_wetter(status)
         else:
             self.datenbank.lege_wetter_an(status)
@@ -47,6 +54,12 @@ class StadtFinder:
         sys.stdout.flush()
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
+        tweets_zu_wetter = self.datenbank.ermittle_anzahl_tweets(status)
+        wetterstatistik = WetterStatistik(status, tweets_zu_wetter)
+        self.statistikchannel.basic_publish(exchange='',
+                                            routing_key="wetterStatistik",
+                                            body=json.dumps(wetterstatistik.__dict__))
+
 
 connection = pika.BlockingConnection(
     pika.ConnectionParameters('192.168.0.151', credentials=PlainCredentials("gast", "gast")))
@@ -54,8 +67,11 @@ connection = pika.BlockingConnection(
 gefundeneStaedteChannel = connection.channel()
 gefundeneStaedteChannel.queue_declare("gefundenesWetter", durable=True)
 
+wetterStatistikChannel = connection.channel()
+wetterStatistikChannel.queue_declare("wetterStatistik", durable=True)
+
 datenbank = Datenbank("datenbank.db")
-stadtFinder = StadtFinder(datenbank)
+stadtFinder = StadtFinder(datenbank, wetterStatistikChannel)
 
 print("Los gehts")
 gefundeneStaedteChannel.basic_consume(stadtFinder.stadt_gefunden,
