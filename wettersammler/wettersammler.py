@@ -27,6 +27,9 @@ class Datenbank:
     def ermittle_anzahl_tweets(self, status):
         return self.datenbank.execute("SELECT Tweets FROM Wetter WHERE Status=?", (status,)).fetchone()[0]
 
+    def alle_stati(self):
+        return self.datenbank.execute("SELECT Status, Tweets FROM Wetter").fetchall()
+
 
 class WetterStatistik(object):
     def __init__(self, status, tweets):
@@ -71,6 +74,16 @@ wetterStatistikChannel = connection.channel()
 wetterStatistikChannel.queue_declare("wetterStatistik", durable=True)
 
 datenbank = Datenbank("datenbank.db")
+
+for row in datenbank.alle_stati():
+    if len(row[0]) == 0:
+        continue
+    print(row[0])
+    wetterstatistik = WetterStatistik(row[0], row[1])
+    wetterStatistikChannel.basic_publish(exchange='',
+                                         routing_key="wetterStatistik",
+                                         body=json.dumps(wetterstatistik.__dict__))
+
 stadtFinder = StadtFinder(datenbank, wetterStatistikChannel)
 
 print("Los gehts")
