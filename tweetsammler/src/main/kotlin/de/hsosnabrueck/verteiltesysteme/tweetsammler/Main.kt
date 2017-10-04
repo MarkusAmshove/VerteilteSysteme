@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
             val twitterStreamFactory = TwitterStreamFactory(configurationBuilder.build())
             val twitterStream = twitterStreamFactory.instance
 
-            val mqSender = MQSender("192.168.0.151", "rawGeoLocations")
+            val mqSender = MQSender("192.168.1.1", "rawGeoLocations")
             StreamListenerHelper.addStatusListener(twitterStream, Listener(mqSender))
 
             val filterQuery = FilterQuery()
