@@ -10,6 +10,7 @@ import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.PieChart
 import javafx.scene.control.Alert.AlertType.INFORMATION
 import javafx.scene.control.Label
+import javafx.scene.layout.FlowPane
 import javafx.scene.layout.GridPane
 import javafx.scene.layout.StackPane
 import tornadofx.*
@@ -20,7 +21,8 @@ class MainView : View("Hello TornadoFX") {
 
     private var chart: PieChart? = null
 
-    private lateinit var labelPanel: StackPane
+    private lateinit var labelPanel: FlowPane
+
 
     init {
         with(root) {
@@ -31,7 +33,9 @@ class MainView : View("Hello TornadoFX") {
                 }
             }
             row {
-                labelPanel = stackpane { }
+                labelPanel = flowpane {
+
+                }
             }
         }
         MQEmpfaenger("192.168.1.1", "wetterStatistik", this::wetterGeaendert)
