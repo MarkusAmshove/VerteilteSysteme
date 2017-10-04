@@ -9,7 +9,9 @@ import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.PieChart
 import javafx.scene.control.Alert.AlertType.INFORMATION
+import javafx.scene.control.Label
 import javafx.scene.layout.GridPane
+import javafx.scene.layout.StackPane
 import tornadofx.*
 
 class MainView : View("Hello TornadoFX") {
@@ -17,6 +19,8 @@ class MainView : View("Hello TornadoFX") {
     override val root = GridPane()
 
     private var chart: PieChart? = null
+
+    private lateinit var labelPanel: StackPane
 
     init {
         with(root) {
@@ -26,8 +30,11 @@ class MainView : View("Hello TornadoFX") {
                     data
                 }
             }
+            row {
+                labelPanel = stackpane { }
+            }
         }
-        MQEmpfaenger("192.168.0.151", "wetterStatistik", this::wetterGeaendert)
+        MQEmpfaenger("192.168.1.1", "wetterStatistik", this::wetterGeaendert)
     }
 
     private fun wetterGeaendert(wetterAenderung: WetterAenderung) {
@@ -37,10 +44,21 @@ class MainView : View("Hello TornadoFX") {
         for (i in chart!!.data.indices) {
             if (chart!!.data[i].name == wetterAenderung.status) {
                 chart!!.data[i].pieValue = wetterAenderung.tweets.toDouble()
+                updateLabels()
                 return
             }
         }
         chart!!.data.add(PieChart.Data(wetterAenderung.status, wetterAenderung.tweets.toDouble()))
+        updateLabels()
+    }
+
+    private fun updateLabels() {
+        labelPanel.children.clear()
+        for (data in chart!!.data) {
+            labelPanel.children.add(
+                    Label("${data.name}: ${data.pieValue}")
+            )
+        }
     }
 
 
