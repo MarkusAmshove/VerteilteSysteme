@@ -65,7 +65,7 @@ class StadtFinder:
 
 
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters('192.168.0.151', credentials=PlainCredentials("gast", "gast")))
+    pika.ConnectionParameters('192.168.1.1', credentials=PlainCredentials("gast", "gast")))
 
 gefundeneStaedteChannel = connection.channel()
 gefundeneStaedteChannel.queue_declare("gefundenesWetter", durable=True)
