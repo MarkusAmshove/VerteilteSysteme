@@ -27,7 +27,7 @@ def finde_start_kommando(programm):
             }[programm]
 
 
-def starte_programm(self, channel, method, properties, body):
+def starte_programm(channel, method, properties, body):
     # programm starten
     try:
         programmpfad = finde_start_kommando(body)
@@ -43,3 +43,4 @@ print("Warte auf zu startende Programme")
 
 programmStartChannel.basic_consume(starte_programm,
                                    queue=PROGRAMM_START_QUEUE)
+programmStartChannel.start_consuming()
