@@ -26,13 +26,13 @@ def finde_start_kommando(programm):
                             + ' &',
             'Auswertungsprogramm': '/home/pi/scm/VerteilteSysteme/auswertung/build/install/auswerter/bin/auswerter &',
             'Tweetsammler': '/home/pi/scm/VerteilteSysteme/tweetsammler/build/install/tweetsammler/bin/tweetsammler ' +
-                            '-ck '
+                            '--ck '
                             + TWITTER_CONSUMERKEY
-                            + '-cs'
+                            + '--cs'
                             + TWITTER_CONSUMERSECRET
-                            + '-at'
+                            + '--at'
                             + TWITTER_ACCESSTOKEN
-                            + '-as'
+                            + '--as'
                             + TWITTER_ACCESSSECRET
                             + ' &'}[programm]
 

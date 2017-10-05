@@ -10,10 +10,10 @@ class Argumente(parser: ArgParser) {
         "#$this"
     })
 
-    val consumerKey by parser.storing("Consumer Key","-ck")
-    val consumerSecret by parser.storing("Consumer Secret","-cs")
-    val accessToken by parser.storing("Accesstoken", "-at")
-    val accessSecret by parser.storing("Accesssecret", "-as")
+    val consumerKey by parser.storing( "--ck", help="Consumer Key")
+    val consumerSecret by parser.storing("--cs", help="Consumer Secret")
+    val accessToken by parser.storing("--at", help="Access Token")
+    val accessSecret by parser.storing("--as", help="Accesssecret")
 }
 
 fun main(args: Array<String>) {
