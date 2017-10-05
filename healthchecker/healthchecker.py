@@ -43,5 +43,5 @@ if __name__ == '__main__':
             programmname= ermittle_programm_name(str(r['name']))
             print("Programm: " + programmname + " Anzahl: " + str(r['consumers']))
             if r['consumers'] < 1:
-                print("\t Starte neuen " + programmname
+                print("\t Starte neuen " + programmname)
                 programm_channel.basic_publish(exchange='',routing_key=PROGRAMM_QUEUE,body=programmname)
