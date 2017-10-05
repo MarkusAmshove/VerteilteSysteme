@@ -21,20 +21,10 @@ def finde_start_kommando(programm):
     OWM_API_KEY = os.getenv("OWM_API_KEY", "")
 
     return {'Wettersammler': 'python /home/pi/scm/VerteilteSysteme/wettersammler/wettersammler.py &',
-            'Wetterfinder': 'python /home/pi/scm/VerteilteSysteme/wetterfinder/wetterfinder.py '
-                            + OWM_API_KEY
-                            + ' &',
+            'Wetterfinder': 'python /home/pi/scm/VerteilteSysteme/wetterfinder/wetterfinder.py &',
             'Auswertungsprogramm': '/home/pi/scm/VerteilteSysteme/auswertung/build/install/auswerter/bin/auswerter &',
-            'Tweetsammler': '/home/pi/scm/VerteilteSysteme/tweetsammler/build/install/tweetsammler/bin/tweetsammler ' +
-                            '--ck '
-                            + TWITTER_CONSUMERKEY
-                            + '--cs'
-                            + TWITTER_CONSUMERSECRET
-                            + '--at'
-                            + TWITTER_ACCESSTOKEN
-                            + '--as'
-                            + TWITTER_ACCESSSECRET
-                            + ' &'}[programm]
+            'Tweetsammler': '/home/pi/scm/VerteilteSysteme/tweetsammler/build/install/tweetsammler/bin/tweetsammler &'
+            }[programm]
 
 
 def starte_programm(self, channel, method, properties, body):
@@ -47,6 +37,7 @@ def starte_programm(self, channel, method, properties, body):
         channel.basic_ack(delivery_tag=method.delivery_tag)
     except:
         pass
+
 
 print("Warte auf zu startende Programme")
 
