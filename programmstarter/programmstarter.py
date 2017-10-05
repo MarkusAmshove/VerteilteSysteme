@@ -2,6 +2,7 @@ import os
 import pika
 import sys
 from pika import PlainCredentials
+import subprocess
 
 PROGRAMM_START_QUEUE = "starts"
 
@@ -42,7 +43,7 @@ def starte_programm(self, channel, method, properties, body):
         programmpfad = finde_start_kommando(body)
         print("Starte " + str(body))
         print("\t" + programmpfad)
-        os.subprocess.call(['bash', '-c', programmpfad], shell=True)
+        subprocess.call(['bash', '-c', programmpfad])
         channel.basic_ack(delivery_tag=method.delivery_tag)
     except:
         pass
