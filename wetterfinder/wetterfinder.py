@@ -5,7 +5,7 @@ import pyowm
 import json
 from pika import PlainCredentials
 
-OWM_API_KEY = str(sys.argv[0])
+OWM_API_KEY = os.getenv("OWM_API_KEY", "")
 RAW_GEOLOCATION_QUEUE = "rawGeoLocations"
 WETTER_QUEUE = "gefundenesWetter"
 
