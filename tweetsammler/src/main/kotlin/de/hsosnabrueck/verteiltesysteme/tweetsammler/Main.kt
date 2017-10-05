@@ -5,6 +5,17 @@ import com.xenomachina.argparser.mainBody
 import twitter4j.*
 import twitter4j.conf.ConfigurationBuilder
 
+class Argumente(parser: ArgParser) {
+    val hashTags by parser.adding("--tags", "-t", help = "Hashtags", transform = {
+        "#$this"
+    })
+
+    val consumerKey by parser.storing("Consumer Key","-ck")
+    val consumerSecret by parser.storing("Consumer Secret","-cs")
+    val accessToken by parser.storing("Accesstoken", "-at")
+    val accessSecret by parser.storing("Accesssecret", "-as")
+}
+
 fun main(args: Array<String>) {
     mainBody("Tweetsammler") {
         Argumente(ArgParser(args)).run {
@@ -16,10 +27,16 @@ fun main(args: Array<String>) {
 
             val configurationBuilder = ConfigurationBuilder()
 
-            configurationBuilder.setOAuthConsumerKey(System.getenv("TWITTER_CONSUMERKEY"))
+            /*configurationBuilder.setOAuthConsumerKey(System.getenv("TWITTER_CONSUMERKEY"))
             configurationBuilder.setOAuthConsumerSecret(System.getenv("TWITTER_CONSUMERSECRET"))
             configurationBuilder.setOAuthAccessToken(System.getenv("TWITTER_ACCESSTOKEN"))
-            configurationBuilder.setOAuthAccessTokenSecret(System.getenv("TWITTER_ACCESSSECRET"))
+            configurationBuilder.setOAuthAccessTokenSecret(System.getenv("TWITTER_ACCESSSECRET"))*/
+
+            configurationBuilder.setOAuthConsumerKey(consumerKey)
+            configurationBuilder.setOAuthConsumerSecret(consumerSecret)
+            configurationBuilder.setOAuthAccessToken(accessToken)
+            configurationBuilder.setOAuthAccessTokenSecret(accessSecret)
+
 
 
             val twitterStreamFactory = TwitterStreamFactory(configurationBuilder.build())
@@ -74,8 +91,3 @@ class Listener(private val mqSender: MQSender) : StatusListener {
 
 }
 
-class Argumente(parser: ArgParser) {
-    val hashTags by parser.adding("--tags", "-t", help = "Hashtags", transform = {
-        "#$this"
-    })
-}
