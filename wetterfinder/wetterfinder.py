@@ -5,14 +5,14 @@ import pyowm
 import json
 from pika import PlainCredentials
 
-OWM_API_KEY = os.getenv("OWM_API_KEY")
+OWM_API_KEY = os.getenv("OWM_API_KEY", "")
 RAW_GEOLOCATION_QUEUE = "rawGeoLocations"
 WETTER_QUEUE = "gefundenesWetter"
 
 owm = pyowm.OWM(OWM_API_KEY)
 
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters('192.168.0.151', credentials=PlainCredentials("gast", "gast")))
+    pika.ConnectionParameters('192.168.1.1', credentials=PlainCredentials("gast", "gast")))
 
 locationChannel = connection.channel()
 locationChannel.queue_declare(RAW_GEOLOCATION_QUEUE, durable=True)
