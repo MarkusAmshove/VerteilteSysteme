@@ -26,6 +26,15 @@ def ermittle_programm_name(consumername):
         'starts': 'Startschlange'
     }[consumername]
 
+def erwuenschte_anzahl_programme(programm_name):
+    return {
+        'Wettersammler': 1,
+        'Wetterfinder': 1,
+        'Auswertungsprogramm': 1,
+        'Tweetsammler': 1,
+        'Startschlange': 5
+    }[programm_name]
+
 
 
 if __name__ == '__main__':
@@ -41,7 +50,9 @@ if __name__ == '__main__':
         cls()
         for r in konsumenten_queues:
             programmname= ermittle_programm_name(str(r['name']))
-            print("Programm: " + programmname + " Anzahl: " + str(r['consumers']))
-            if r['name'] !=  'starts' and r['consumers'] < 1:
-                print("\t Starte neuen " + programmname)
-                programm_channel.basic_publish(exchange='',routing_key=PROGRAMM_QUEUE,body=programmname)
+            gewuenschte_anzahl = erwuenschte_anzahl_programme(programmname)
+            print("Programm: " + programmname + " Anzahl: " + str(r['consumers']) + "/"+str(gewuenschte_anzahl))
+            if r['name'] !=  'starts':
+                if r['consumers'] < gewuenschte_anzahl:
+                    print("\t Starte neuen " + programmname)
+                    programm_channel.basic_publish(exchange='',routing_key=PROGRAMM_QUEUE,body=programmname)
